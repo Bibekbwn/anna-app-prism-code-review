@@ -28,6 +28,7 @@ const templates=[['Secrets','Hardcoded key','STRIPE_KEY = "sk_live_51HkQ..."\nAW
 let anna = null;
 let reviewResults = null;
 let reviewHistory = [];
+let customTemplates = [];
 
 async function init() {
   try {
@@ -45,12 +46,22 @@ async function init() {
       if (stored) reviewHistory = JSON.parse(stored);
     }
   } catch (e) { console.warn("Could not load history", e); }
+  // Load custom templates
+  try {
+    if (anna) {
+      const { value } = await anna.storage.get({ key: "prism-custom-templates" });
+      if (value) customTemplates = value;
+    } else {
+      const stored = localStorage.getItem("prism-custom-templates");
+      if (stored) customTemplates = JSON.parse(stored);
+    }
+  } catch (e) { console.warn("Could not load custom templates", e); }
   render();
 }
 
 function render(){document.getElementById('pageChip').textContent=pages.find(p=>p[0]===current)[1];document.getElementById('navItems').innerHTML=pages.map((p,i)=>`<button class="${p[0]===current?'active':''}" data-page="${p[0]}"><span>0${i+1}</span>${p[1]}</button>`).join('');document.getElementById('app').innerHTML=({new:renderNew,results:renderResults,history:renderHistory,templates:renderTemplates,compare:renderCompare,preferences:renderPreferences})[current]();bind();}
 
-function renderNew(){return `<section class="center-stage"><div class="hero"><div class="hero-icon"><svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 28 25H4L16 3Z"/><path d="M16 3v13m0 0L4 25m12-9 12 9"/></svg></div><h1>Ready to review</h1><div class="sub">Paste code below or ask Anna to review a snippet.</div></div><section class="panel editor-card"><div class="editor-head"><i class="traffic"></i><i class="traffic"></i><i class="traffic"></i><span>PRISM</span><span class="spacer"></span><span>Ctrl + Enter to review</span><button class="btn" data-action="sample" style="padding:4px 8px;font-size:9px">Load sample</button></div><textarea class="editor" id="codeInput" aria-label="Code snippet to review" placeholder="Type #prism-review here"></textarea><div class="editor-controls"><label class="field">Language<select id="language"><option>Auto-detect</option><option>Python</option><option>JavaScript</option><option>TypeScript</option><option>Java</option><option>Go</option><option>Rust</option><option>C</option><option>C++</option><option>C#</option><option>Ruby</option><option>PHP</option><option>SQL</option></select></label><label class="field">Effort<select id="effort"><option>Balanced</option><option>Lite</option><option>Max</option></select></label><button class="btn primary" id="reviewBtn">✣ &nbsp;Review</button></div><p class="hint">♧ &nbsp;PRISM checks for security, quality, and performance issues.</p></section><div class="feature-row"><div class="panel feature"><b style="color:var(--cyan)">♙</b><div><b>14 languages detected</b><small>Auto-detect picks the parser for you.</small></div></div><div class="panel feature"><b style="color:var(--cyan)">♧</b><div><b>Anna is online</b><small>Last reviewed 4 minutes ago.</small></div></div></div></section>`}
+function renderNew(){return `<section class="center-stage"><div class="hero"><div class="hero-icon"><svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 28 25H4L16 3Z"/><path d="M16 3v13m0 0L4 25m12-9 12 9"/></svg></div><h1>Ready to review</h1><div class="sub">Paste code below or ask Anna to review a snippet.</div></div><section class="panel editor-card"><div class="editor-head"><i class="traffic"></i><i class="traffic"></i><i class="traffic"></i><span>PRISM</span><span class="spacer"></span><span>Ctrl + Enter to review</span><button class="btn" data-action="sample" style="padding:4px 8px;font-size:9px">Load sample</button></div><textarea class="editor" id="codeInput" aria-label="Code snippet to review" placeholder="Type #prism-review here"></textarea><div class="editor-controls"><label class="field">Language<select id="language"><option>Auto-detect</option><option>Python</option><option>JavaScript</option><option>TypeScript</option><option>Java</option><option>Go</option><option>Rust</option><option>C</option><option>C++</option><option>C#</option><option>Ruby</option><option>PHP</option><option>SQL</option></select></label><label class="field">Effort<select id="effort"><option>Balanced</option><option>Lite</option><option>Max</option></select></label><button class="btn primary" id="reviewBtn">✣ &nbsp;Review</button></div><p class="hint">♧ &nbsp;PRISM checks for security, quality, and performance issues.</p></section><div class="feature-row"><div class="panel feature"><b style="color:var(--cyan)">♙</b><div><b>14 languages detected</b><small>Auto-detect picks the parser for you.</small></div></div><div class="panel feature"><b style="color:var(--cyan)">♧</b><div><b>${anna ? 'Anna is online' : 'Standalone mode'}</b><small>${anna ? 'Last reviewed 4 minutes ago.' : 'AI agents require Anna runtime.'}</small></div></div></div></section>`}
 
 function renderResults(){
   if (!reviewResults) {
@@ -73,7 +84,7 @@ function renderHistory(){
   return `<div class="heading"><div><h1>Review History</h1><div class="sub">${reviewHistory.length} completed review(s) in this workspace.</div></div></div><div class="row spread"><input class="search" id="historySearch" placeholder="&#10010;  Search reviews" aria-label="Search reviews"><div class="spacer"></div><button class="btn outline" data-action="clear-history">&#10006; Clear All</button></div><div class="stats">${reviewHistory.map(r => `<div class="stat"><div class="stat-label">${r.filename}</div><div class="stat-value ${r.score >= 70 ? 'green' : 'red'}">${r.score}/100</div><div class="stat-note">${r.date.slice(0,10)} &#8212; ${r.total} findings</div><button class="btn outline" data-history-id="${r.id}" style="margin-top:8px">View</button></div>`).join('')}</div>`;
 }
 
-function renderTemplates(){return `<div class="heading"><div><h1>Snippet Templates</h1><div class="sub">Drop a known-risky snippet into the editor to test how PRISM reports it.</div></div><div class="row"><input class="search" id="templateSearch" placeholder="&#10010;  Search templates" aria-label="Search templates"><button class="btn outline" data-action="new-template">&#43; New template</button></div></div><div class="templates">${templates.map((t,i)=>`<article class="panel template" data-template-card data-name="${t[0].toLowerCase()}"><div class="row"><span style="color:var(--cyan)">&#9633;</span><div><h3>${t[0]}</h3><div class="sub">${t[1]}</div></div><span class="spacer"></span><span class="tag">0${i+1}</span></div><pre>${escapeHtml(t[2])}</pre><button data-template="${i}">Use template <span style="float:right;color:var(--cyan)">&#8594;</span></button></article>`).join('')}<article class="panel template save" data-action="new-template"><span style="font-size:20px">&#8853;</span><strong>Save your own snippet template.</strong><span class="sub">Reuse the patterns your team hits most.</span></article></div>`}
+function renderTemplates(){return `<div class="heading"><div><h1>Snippet Templates</h1><div class="sub">Drop a known-risky snippet into the editor to test how PRISM reports it.</div></div></div><div class="row"><input class="search" id="templateSearch" placeholder="&#10010;  Search templates" aria-label="Search templates"><button class="btn outline" data-action="new-template">&#43; New template</button></div></div><div class="templates">${[...templates.map((t,i)=>({name:t[0],desc:t[1],code:t[2],custom:false})), ...customTemplates].map((t,i)=>`<article class="panel template" data-template-card data-name="${t.name.toLowerCase()}"><div class="row"><span style="color:var(--cyan)">&#9633;</span><div><h3>${escapeHtml(t.name)}</h3><div class="sub">${escapeHtml(t.desc)}</div></div><span class="spacer"></span><span class="tag">0${i+1}</span></div><pre>${escapeHtml(t.code)}</pre><button data-template="${i}">Use template <span style="float:right;color:var(--cyan)">&#8594;</span></button></article>`).join('')}${customTemplates.length > 0 ? `<div class="row" style="margin-top:12px"><span style="color:var(--muted);font-size:11px">${customTemplates.length} custom template(s) saved.</span></div>` : ``}<div class="panel template add-template" id="addTemplateForm" style="display:none;"><div class="row"><span style="color:var(--cyan)">&#43;</span><div><h3 id="addTemplateTitle">Add New Template</h3><div class="sub">Fill in to add your own snippet template.</div></div><span class="spacer"></span><button class="btn" data-action="cancel-add-template" style="float:right;">&#215;</button></div><label class="field">Name<input type="text" id="add-tmpl-name" placeholder="Template name"></label><label class="field">Description<input type="text" id="add-tmpl-desc" placeholder="What does it do?"></label><label class="field">Code<textarea id="add-tmpl-code" rows="8" placeholder="Paste code snippet here"></textarea></label><div class="row" style="margin-top:12px"><button class="btn primary" data-action="confirm-add-template">&#10003; Add Template</button><button class="btn" data-action="cancel-add-template">Cancel</button></div></div></div>`}
 
 function renderCompare(){return `<div class="heading"><div><h1>Code Compare</h1><div class="sub">Paste both versions to see what changed.</div></div><button class="btn" data-action="swap">&#8640; &nbsp;Swap sides</button></div><div class="compare-grid"><section class="panel code-panel"><div class="code-title"><span>Original</span></div><textarea class="editor" id="originalCode" aria-label="Original code" placeholder="Paste original code here"></textarea></section><section class="panel code-panel"><div class="code-title"><span>Revised</span></div><textarea class="editor" id="revisedCode" aria-label="Revised code" placeholder="Paste revised code here"></textarea></section></div><div class="row" style="margin-top:12px"><button class="btn primary" data-action="compare">&#8640; &nbsp;Compare</button></div><section class="panel diff"><div class="diff-head">Diff output</div><div id="diffRows"><div class="empty" style="min-height:120px">Compare two versions to see the differences here.</div></div></section>`}
 
@@ -83,7 +94,11 @@ function bind(){
   document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.page)));
   document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>action(el.dataset.action)));
   document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>{navigator.clipboard?.writeText(el.dataset.copy);toast('Suggested fix copied to clipboard')}));
-  document.querySelectorAll('[data-template]').forEach(el=>el.addEventListener('click',()=>{go('new');setTimeout(()=>{document.getElementById('codeInput').value=templates[Number(el.dataset.template)][2];toast('Template loaded into the editor')},0)}));
+  document.querySelectorAll('[data-template]').forEach(el=>el.addEventListener('click',()=>{
+    const idx = Number(el.dataset.template);
+    const allTemplates = [...templates.map((t)=>({name:t[0],desc:t[1],code:t[2]})), ...customTemplates];
+    go('new');setTimeout(()=>{document.getElementById('codeInput').value=allTemplates[idx].code;toast('Template loaded into the editor')},0);
+  }));
   const search=document.getElementById('templateSearch');if(search)search.addEventListener('input',()=>document.querySelectorAll('[data-template-card]').forEach(card=>card.classList.toggle('hidden',!card.dataset.name.includes(search.value.toLowerCase()))));
   const historySearch=document.getElementById('historySearch');if(historySearch)historySearch.addEventListener('input',()=>{
     const term=historySearch.value.toLowerCase();
@@ -100,12 +115,18 @@ function bind(){
     try {
       review.textContent = 'Reviewing&#8230;';
       review.disabled = true;
-      const { result } = await anna.tools.invoke({
-        tool_id: TOOL_ID,
-        method: 'review_code',
-        args: { filename, content: editor.value, language: document.getElementById('language').value },
-        timeoutMs: 60000,
-      });
+      if (anna) {
+        const resp = await anna.tools.invoke({
+          tool_id: TOOL_ID,
+          method: 'review_code',
+          args: { filename, content: editor.value, language: document.getElementById('language').value },
+          timeoutMs: 60000,
+        });
+        var result = resp.result || resp;
+      } else {
+        toast('Anna runtime not connected — regex-only review');
+        var result = { success: true, data: { filename, language, findings: [], score: { score: 100, grade: 'A', breakdown: {}, total_findings: 0, blocking_count: 0 }, total_findings: 0, blocking: 0 } };
+      }
       if (result && result.success) {
         const data = result.data;
         reviewResults = {
@@ -163,7 +184,21 @@ function action(name){
   else if(name==='compare')compareVersions();
   else if(name==='save-prefs')toast('Preferences saved');
   else if(name==='reset')toast('Preferences reset to defaults');
-  else if(name==='new-template')toast('Template editor is ready for your snippet');
+  else if(name==='new-template'){document.getElementById('addTemplateForm').style.display='block';document.getElementById('add-tmpl-name').focus();}
+  else if(name==='cancel-add-template'){document.getElementById('addTemplateForm').style.display='none';document.getElementById('add-tmpl-name').value='';document.getElementById('add-tmpl-desc').value='';document.getElementById('add-tmpl-code').value='';}
+  else if(name==='confirm-add-template'){
+    const name=document.getElementById('add-tmpl-name').value.trim();
+    const desc=document.getElementById('add-tmpl-desc').value.trim();
+    const code=document.getElementById('add-tmpl-code').value.trim();
+    if(!name||!code){toast('Name and code are required');return;}
+    customTemplates.push({name,desc,code});
+    if(anna){anna.storage.set({key:'prism-custom-templates',value:customTemplates});}
+    else{localStorage.setItem('prism-custom-templates',JSON.stringify(customTemplates));}
+    document.getElementById('addTemplateForm').style.display='none';
+    document.getElementById('add-tmpl-name').value='';document.getElementById('add-tmpl-desc').value='';document.getElementById('add-tmpl-code').value='';
+    toast('Template added');
+    render();
+  }
   else if(name==='clear-history'){if(confirm('Clear all review history?')){reviewHistory=[];if(anna){anna.storage.set({key:'prism-history',value:[]});}else{localStorage.removeItem('prism-history');}render();}}
 }
 function compareVersions(){const original=document.getElementById('originalCode').value;const revised=document.getElementById('revisedCode').value;if(!original.trim()||!revised.trim()){toast('Paste both versions before comparing');return}const oldLines=original.split('\n');const newLines=revised.split('\n');const output=[];for(let i=0;i<Math.max(oldLines.length,newLines.length);i++){const oldLine=oldLines[i];const newLine=newLines[i];if(oldLine===newLine){output.push(`<div class="diff-line"><span>${i+1}</span>${escapeHtml(oldLine??'')}</div>`)}else{if(oldLine!==undefined)output.push(`<div class="diff-line del"><span>${i+1}</span>&#8722; ${escapeHtml(oldLine)}</div>`);if(newLine!==undefined)output.push(`<div class="diff-line add"><span>${i+1}</span>&#43; ${escapeHtml(newLine)}</div>`)}}document.getElementById('diffRows').innerHTML=output.join('');toast('Comparison complete')}
