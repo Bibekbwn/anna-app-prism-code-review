@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080d15">
+<title>PRISM — Code Review Assistant</title>
+<style>
+:root{color-scheme:dark;--bg:#080d15;--panel:#111720;--panel2:#0c1320;--line:#26303b;--muted:#8090a5;--text:#e5edf7;--cyan:#19d5e8;--blue:#3279ff;--green:#36dc88;--red:#ff626b;--amber:#ffbf36;--violet:#a995ff;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;--sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 14% 17%,#0736408c 0,transparent 28rem),radial-gradient(ellipse at 86% 81%,#29225270 0,transparent 30rem),var(--bg);color:var(--text);font:14px/1.5 var(--sans);min-height:100vh}button,input,textarea,select{font:inherit}button{color:inherit;cursor:pointer}.topbar{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;border-bottom:2px solid #326efc;background:#0a1220;position:sticky;top:0;z-index:5}.brand{display:flex;align-items:center;gap:9px;color:#f1f6ff}.brand-mark{width:29px;height:29px;border-radius:9px;background:linear-gradient(135deg,#21e0ef,#067c9e);display:grid;place-items:center;color:#07121d;font-size:17px;box-shadow:0 0 20px #14d8ec50}.brand-name{font-size:12px;font-weight:800;letter-spacing:.04em;line-height:1.1}.brand-tag{font-size:8px;color:var(--cyan);margin-top:2px}.page-chip{border:1px solid #174259;border-radius:99px;padding:5px 13px;color:#88e9f4;font-size:11px;background:#0d2330}.menu-wrap{position:relative}.menu-button,.icon-button,.btn{border:1px solid var(--line);border-radius:8px;background:#151c27;color:#cbd5e1;padding:7px 10px;font-size:11px}.menu-button{font-size:16px;line-height:1;padding:5px 10px}.menu{position:absolute;right:0;top:40px;width:205px;padding:9px;background:#0d1624;border:1px solid #263446;border-radius:12px;box-shadow:0 15px 40px #0009;display:none}.menu.open{display:block}.menu small{display:block;color:#71849d;padding:0 9px 7px;text-transform:uppercase;font-size:9px}.menu button{display:flex;width:100%;gap:9px;border:0;background:transparent;text-align:left;padding:8px;border-radius:7px;font-size:11px;color:#cbd5e1}.menu button:hover,.menu button.active{background:#12303d;color:#8aeff8}.menu button span{font-family:var(--mono);font-size:9px;color:#71849d}.menu-foot{display:flex;justify-content:space-between;border-top:1px solid #202b38;margin-top:7px;padding:8px 9px 2px;color:#73849a;font:9px var(--mono)}.menu-foot b{color:var(--cyan)}main{width:min(1120px,calc(100% - 48px));margin:25px auto 54px}.heading{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:16px}.heading h1{font-size:21px;line-height:1.2;margin:0 0 5px;letter-spacing:-.02em}.sub{color:var(--muted);font-size:11px}.mono{font-family:var(--mono)}.row{display:flex;align-items:center;gap:8px}.spread{justify-content:space-between}.panel{background:#111720e8;border:1px solid var(--line);border-radius:12px}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:17px 0 13px}.stat{padding:14px 16px;min-height:98px;position:relative;overflow:hidden}.stat:after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(110deg,#1bd5e81a,transparent 65%)}.stat-label{color:#a5b4c7;font-size:9px;text-transform:uppercase;font-weight:700}.stat-value{font-size:23px;font-weight:750;line-height:1.15;margin:7px 0;color:var(--cyan)}.stat-value.red{color:var(--red)}.stat-value.green{color:var(--green)}.stat-value.violet{color:#c4b5fd}.stat-note{font-size:10px;color:var(--muted)}.dot{width:7px;height:7px;background:var(--cyan);border-radius:50%;position:absolute;right:14px;top:15px}.toolbar{display:flex;align-items:center;gap:6px;padding:8px;margin:13px 0 14px}.filter{border:1px solid #283441;border-radius:99px;padding:5px 10px;background:#17202b;color:#c2cedb;font-size:10px}.filter.active{background:#18c9de;color:#06131a;border-color:#18c9de;font-weight:700}.spacer{flex:1}.btn{padding:7px 11px}.btn:hover,.icon-button:hover{border-color:#27889a;color:#92f4fc}.btn.primary{background:linear-gradient(135deg,#22d6e7,#06a6c4);border:0;color:#04131a;font-weight:750;padding:9px 17px;box-shadow:0 5px 20px #10cddd35}.btn.outline{border-color:#12677b;color:#72eaf4;background:#0c222b}.btn.danger{border-color:#77383d;color:#ff9299}.finding{padding:13px 15px;margin-bottom:11px}.finding-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:7px}.badge{font-size:9px;font-weight:800;border-radius:6px;padding:3px 8px;color:#07121d}.badge.critical{background:var(--red)}.badge.high{background:var(--amber)}.badge.medium{background:var(--green);color:#06131a}.badge.low{background:var(--cyan);color:#06131a}.finding-file{font-family:var(--mono);font-size:10px;color:var(--muted);margin-left:auto}.finding-body{font-size:12px;color:var(--text)}.finding-fix{margin-top:8px;padding:10px;border-radius:8px;background:#0c1320;border:1px solid var(--line);display:none}.finding-fix.open{display:block}.fix-label{font-size:9px;color:var(--muted);text-transform:uppercase;margin-bottom:5px}.fix-code{font-family:var(--mono);font-size:11px;color:var(--green);white-space:pre-wrap;overflow-x:auto}.empty{padding:40px 20px;text-align:center;color:var(--muted)}.empty span{font-size:32px;display:block;margin-bottom:10px}.feature-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.feature{padding:14px 16px}.feature b{font-size:13px}.feature small{font-size:10px;color:var(--muted);display:block;margin-top:3px}.templates{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.template{padding:14px 16px}.template h3{font-size:13px;margin-bottom:3px}.template .sub{font-size:10px;color:var(--muted);margin-bottom:8px}.template pre{font-size:10px;color:var(--muted);margin-bottom:8px;overflow-x:auto;max-height:120px}.tag{font-size:9px;color:var(--cyan);font-weight:700}.compare-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.code-title{font-size:10px;color:var(--muted);margin-bottom:6px;text-transform:uppercase}.diff{margin-top:14px}.diff-head{font-size:10px;color:var(--muted);margin-bottom:8px;text-transform:uppercase}.diff-line{font-family:var(--mono);font-size:11px;padding:4px 8px;display:flex;gap:8px}.diff-line del{color:var(--red);text-decoration:none}.diff-line add{color:var(--green);text-decoration:none}.diff-line span{color:var(--muted);min-width:28px}.prefs{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.pref-card{padding:16px}.pref-icon{font-size:20px;display:block;margin-bottom:8px}.pref-card h3{font-size:13px;margin-bottom:4px}.pref-card p{font-size:10px;color:var(--muted);margin-bottom:10px}.checkline{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted)}.pref-actions{padding:12px 16px;border-top:1px solid var(--line)}.search{width:100%;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:#0c1320;color:var(--text);font-size:11px}.editor-head{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);border-radius:8px 8px 0 0}.traffic{width:10px;height:10px;border-radius:50%;background:#e5734f}.traffic:nth-child(2){background:#f0c419}.traffic:nth-child(3){background:#4ec94b}.editor{width:100%;height:320px;background:#070c12;border:none;resize:vertical;outline:none;padding:14px;font-family:var(--mono);font-size:12px;color:var(--text)}.editor-controls{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--line)}.field{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--muted)}.field select{border:1px solid var(--line);border-radius:6px;background:#0c1320;color:var(--text);padding:4px 8px;font-size:10px}.hint{font-size:10px;color:var(--muted);margin-top:8px}.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);padding:10px 16px;border-radius:8px;background:#0a1220;border:1px solid var(--line);color:var(--text);font-size:11px;opacity:0;transition:opacity .2s;pointer-events:none}.toast.show{opacity:1}
+@media(max-width:720px){main{width:calc(100% - 28px);margin-top:18px}.stats{grid-template-columns:repeat(2,1fr);gap:8px}.stat{min-height:88px;padding:12px}.heading h1{font-size:18px}.toolbar{flex-wrap:wrap}.toolbar .spacer{flex-basis:100%;height:0}.templates{grid-template-columns:1fr}.prefs{grid-template-columns:1fr}.feature-row{grid-template-columns:1fr}.compare-grid{grid-template-columns:1fr}.topbar{padding:0 13px}.editor-controls{flex-wrap:wrap}.editor-controls .btn{margin-left:0}.center-stage{margin-top:5px}}
+@media(max-width:450px){.templates{grid-template-columns:1fr}.page-chip{font-size:10px;padding:4px 9px}.stats{gap:7px}.stat-value{font-size:20px}.heading{align-items:flex-start}.heading>.row{flex-wrap:wrap;justify-content:flex-end}.finding{padding:11px}.editor{height:240px}}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="brand"><div class="brand-mark"><svg viewBox="0 0 32 32" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 28 25H4L16 3Z"/><path d="M16 3v13m0 0L4 25m12-9 12 9"/></svg></div><div><div class="brand-name">PRISM</div><div class="brand-tag">Code Review Assistant</div></div></div><div class="page-chip" id="pageChip">New Review</div><div class="menu-wrap"><button class="menu-button" id="menuToggle" aria-label="Open page navigation" aria-expanded="false">⋮</button><nav class="menu" id="navMenu" aria-label="Page navigation"><small>Go to page</small><div id="navItems"></div><div class="menu-foot"><span>Workspace</span><b>local</b></div></nav></div></header>
+<main id="app" aria-live="polite"></main><div class="toast" id="toast" role="status"></div>
+<script type="module">
+import { AnnaAppRuntime } from "/static/anna-apps/_sdk/latest/index.js";
+
+const TOOL_ID = "tool-dev-prism-review";
+
+const pages=[['new','New Review'],['results','Review Results'],['history','Review History'],['templates','Snippet Templates'],['compare','Code Compare'],['preferences','Preferences']];
+const sample=`import os\nimport sqlite3\n\ndef get_user(username):\n    conn = sqlite3.connect("app.db")\n    cursor = conn.cursor()\n    query = f"SELECT * FROM users WHERE name = '{username}'"\n    cursor.execute(query)\n    return cursor.fetchone()\n\ndef run(user_input):\n    return eval(user_input)`;
+let current='new',menuOpen=false;
+const templates=[['Secrets','Hardcoded key','STRIPE_KEY = "sk_live_51HkQ..."\nAWS_SECRET = "AKIA3KQ..."'],['Eval Risk','Dynamic execution','value = eval(user_input)\nexec(payload)'],['SQL Injection','Unescaped query','query = f"SELECT * FROM users\n  WHERE name = \'{username}\'"'],['Unused Import','Lint','import os\nimport json\nimport sqlite3\n# os never used'],['Long Function','Complexity','def process_checkout(req):\n  # 96 lines, 7 branches\n  ...']];
+
+let anna = null;
+let reviewResults = null;
+let reviewHistory = [];
+
+async function init() {
+  try {
+    anna = await AnnaAppRuntime.connect();
+  } catch (e) {
+    console.warn("Anna runtime not available, standalone mode");
+  }
+  // Load history from storage
+  try {
+    if (anna) {
+      const { value } = await anna.storage.get({ key: "prism-history" });
+      if (value) reviewHistory = value;
+    } else {
+      const stored = localStorage.getItem("prism-history");
+      if (stored) reviewHistory = JSON.parse(stored);
+    }
+  } catch (e) { console.warn("Could not load history", e); }
+  render();
+}
+
+function render(){document.getElementById('pageChip').textContent=pages.find(p=>p[0]===current)[1];document.getElementById('navItems').innerHTML=pages.map((p,i)=>`<button class="${p[0]===current?'active':''}" data-page="${p[0]}"><span>0${i+1}</span>${p[1]}</button>`).join('');document.getElementById('app').innerHTML=({new:renderNew,results:renderResults,history:renderHistory,templates:renderTemplates,compare:renderCompare,preferences:renderPreferences})[current]();bind();}
+
+function renderNew(){return `<section class="center-stage"><div class="hero"><div class="hero-icon"><svg viewBox="0 0 32 32" width="34" height="34" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 3 28 25H4L16 3Z"/><path d="M16 3v13m0 0L4 25m12-9 12 9"/></svg></div><h1>Ready to review</h1><div class="sub">Paste code below or ask Anna to review a snippet.</div></div><section class="panel editor-card"><div class="editor-head"><i class="traffic"></i><i class="traffic"></i><i class="traffic"></i><span>PRISM</span><span class="spacer"></span><span>Ctrl + Enter to review</span><button class="btn" data-action="sample" style="padding:4px 8px;font-size:9px">Load sample</button></div><textarea class="editor" id="codeInput" aria-label="Code snippet to review" placeholder="Type #prism-review here"></textarea><div class="editor-controls"><label class="field">Language<select id="language"><option>Auto-detect</option><option>Python</option><option>JavaScript</option><option>TypeScript</option><option>Java</option><option>Go</option><option>Rust</option><option>C</option><option>C++</option><option>C#</option><option>Ruby</option><option>PHP</option><option>SQL</option></select></label><label class="field">Effort<select id="effort"><option>Balanced</option><option>Lite</option><option>Max</option></select></label><button class="btn primary" id="reviewBtn">✣ &nbsp;Review</button></div><p class="hint">♧ &nbsp;PRISM checks for security, quality, and performance issues.</p></section><div class="feature-row"><div class="panel feature"><b style="color:var(--cyan)">♙</b><div><b>14 languages detected</b><small>Auto-detect picks the parser for you.</small></div></div><div class="panel feature"><b style="color:var(--cyan)">♧</b><div><b>Anna is online</b><small>Last reviewed 4 minutes ago.</small></div></div></div></section>`}
+
+function renderResults(){
+  if (!reviewResults) {
+    return `<div class="heading"><div><h1>Review Results</h1><div class="sub">A review has not been run in this workspace yet.</div></div></div><div class="panel empty" style="min-height:260px"><span style="font-size:22px;color:var(--cyan)">◴</span><strong>No review results</strong>Run a review from New Review and findings will appear here.<button class="btn primary" data-page="new" style="justify-self:center;margin-top:10px">Go to New Review</button></div>`;
+  }
+  const { score, findings, filename, language } = reviewResults;
+  const critical = findings.filter(f => f.severity === 'critical').length;
+  const high = findings.filter(f => f.severity === 'high').length;
+  const medium = findings.filter(f => f.severity === 'medium').length;
+  const low = findings.filter(f => f.severity === 'low').length;
+  const grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F';
+  const gradeColor = grade === 'A' || grade === 'B' ? 'var(--green)' : grade === 'C' ? 'var(--amber)' : grade === 'D' ? 'var(--red)' : 'var(--red)';
+  return `<div class="heading"><div><h1>Review Results</h1><div class="sub">${filename} &#8212; ${language}</div></div><div class="row spread"><div class="stat-card" style="padding:12px"><div class="stat-label">Score</div><div class="stat-value" style="color:${gradeColor}">${score}/100</div><div class="stat-note">Grade ${grade}</div></div><div class="stat-card" style="padding:12px"><div class="stat-label">Findings</div><div class="stat-value">${findings.length}</div><div class="stat-note">Total issues</div></div></div></div><div class="stats"><div class="stat"><div class="stat-label">Critical</div><div class="stat-value red">${critical}</div><div class="stat-note">Blocking issues</div></div><div class="stat"><div class="stat-label">High</div><div class="stat-value red">${high}</div><div class="stat-note">High severity</div></div><div class="stat"><div class="stat-label">Medium</div><div class="stat-value amber">${medium}</div><div class="stat-note">Medium severity</div></div><div class="stat"><div class="stat-label">Low</div><div class="stat-value cyan">${low}</div><div class="stat-note">Low severity</div></div></div><div class="toolbar"><div class="filter active" data-filter="all">All</div><div class="filter" data-filter="critical">Critical</div><div class="filter" data-filter="high">High</div><div class="filter" data-filter="medium">Medium</div><div class="filter" data-filter="low">Low</div><div class="spacer"></div><button class="btn primary" data-action="save">&#10003; Save</button></div><div class="findings-list">${findings.map(f => `<article class="finding" data-severity="${f.severity}"><div class="finding-top"><span class="badge ${f.severity}">${f.severity}</span><span class="finding-file">${f.file}:${f.line}</span><span class="finding-rule" style="font-family:var(--mono);font-size:9px;color:var(--muted)">${f.rule_id}</span></div><div class="finding-body">${escapeHtml(f.problem)}</div><div class="finding-fix" id="fix-${f.rule_id}-${f.line}"><div class="fix-label">Suggested fix:</div><pre class="fix-code">${escapeHtml(f.suggested_code || 'No fix available')}</pre></div>${f.suggested_code ? `<button class="btn outline" data-fix-toggle="${f.rule_id}-${f.line}" style="margin-top:6px">Show Fix</button>` : ''}</article>`).join('')}</div></div>`;
+}
+
+function renderHistory(){
+  if (reviewHistory.length === 0) {
+    return `<div class="heading"><div><h1>Review History</h1><div class="sub">No reviews have been run in this workspace yet.</div></div></div><div class="panel empty" style="min-height:220px"><span style="font-size:20px">◴</span><strong>No reviews yet</strong>Completed reviews will appear here.<button class="btn primary" data-page="new" style="justify-self:center;margin-top:10px">Start a Review</button></div>`;
+  }
+  return `<div class="heading"><div><h1>Review History</h1><div class="sub">${reviewHistory.length} completed review(s) in this workspace.</div></div></div><div class="row spread"><input class="search" id="historySearch" placeholder="&#10010;  Search reviews" aria-label="Search reviews"><div class="spacer"></div><button class="btn outline" data-action="clear-history">&#10006; Clear All</button></div><div class="stats">${reviewHistory.map(r => `<div class="stat"><div class="stat-label">${r.filename}</div><div class="stat-value ${r.score >= 70 ? 'green' : 'red'}">${r.score}/100</div><div class="stat-note">${r.date.slice(0,10)} &#8212; ${r.total} findings</div><button class="btn outline" data-history-id="${r.id}" style="margin-top:8px">View</button></div>`).join('')}</div>`;
+}
+
+function renderTemplates(){return `<div class="heading"><div><h1>Snippet Templates</h1><div class="sub">Drop a known-risky snippet into the editor to test how PRISM reports it.</div></div><div class="row"><input class="search" id="templateSearch" placeholder="&#10010;  Search templates" aria-label="Search templates"><button class="btn outline" data-action="new-template">&#43; New template</button></div></div><div class="templates">${templates.map((t,i)=>`<article class="panel template" data-template-card data-name="${t[0].toLowerCase()}"><div class="row"><span style="color:var(--cyan)">&#9633;</span><div><h3>${t[0]}</h3><div class="sub">${t[1]}</div></div><span class="spacer"></span><span class="tag">0${i+1}</span></div><pre>${escapeHtml(t[2])}</pre><button data-template="${i}">Use template <span style="float:right;color:var(--cyan)">&#8594;</span></button></article>`).join('')}<article class="panel template save" data-action="new-template"><span style="font-size:20px">&#8853;</span><strong>Save your own snippet template.</strong><span class="sub">Reuse the patterns your team hits most.</span></article></div>`}
+
+function renderCompare(){return `<div class="heading"><div><h1>Code Compare</h1><div class="sub">Paste both versions to see what changed.</div></div><button class="btn" data-action="swap">&#8640; &nbsp;Swap sides</button></div><div class="compare-grid"><section class="panel code-panel"><div class="code-title"><span>Original</span></div><textarea class="editor" id="originalCode" aria-label="Original code" placeholder="Paste original code here"></textarea></section><section class="panel code-panel"><div class="code-title"><span>Revised</span></div><textarea class="editor" id="revisedCode" aria-label="Revised code" placeholder="Paste revised code here"></textarea></section></div><div class="row" style="margin-top:12px"><button class="btn primary" data-action="compare">&#8640; &nbsp;Compare</button></div><section class="panel diff"><div class="diff-head">Diff output</div><div id="diffRows"><div class="empty" style="min-height:120px">Compare two versions to see the differences here.</div></div></section>`}
+
+function renderPreferences(){return `<div class="heading"><div><h1>Preferences</h1><div class="sub">Defaults are applied every time you open New Review.</div></div></div><div class="prefs"><section class="panel pref-card"><div class="pref-icon">&#9679;</div><h3>Default effort</h3><p>How deep the reviewers analyse each commit.</p><select aria-label="Default effort"><option>Balanced</option><option>Lite</option><option>Max</option></select></section><section class="panel pref-card"><div class="pref-icon">&#9760;</div><h3>Theme</h3><p>Interface appearance for the whole workspace.</p><select aria-label="Theme"><option>Dark</option><option>System</option><option>Light</option></select></section><section class="panel pref-card"><div class="pref-icon">&#9831;</div><h3>Show AI suggestions</h3><p>Display the suggested fix block under every finding.</p><label class="checkline"><input type="checkbox" checked> Enabled</label></section></div><div class="panel pref-actions row"><span class="spacer">Preferences are stored locally for this workspace and applied to every new review.</span><button class="btn" data-action="reset">&#8635; &nbsp;Reset</button><button class="btn outline" data-action="save-prefs">&#10003; &nbsp;Save preferences</button></div>`}
+
+function bind(){
+  document.querySelectorAll('[data-page]').forEach(el=>el.addEventListener('click',()=>go(el.dataset.page)));
+  document.querySelectorAll('[data-action]').forEach(el=>el.addEventListener('click',()=>action(el.dataset.action)));
+  document.querySelectorAll('[data-copy]').forEach(el=>el.addEventListener('click',()=>{navigator.clipboard?.writeText(el.dataset.copy);toast('Suggested fix copied to clipboard')}));
+  document.querySelectorAll('[data-template]').forEach(el=>el.addEventListener('click',()=>{go('new');setTimeout(()=>{document.getElementById('codeInput').value=templates[Number(el.dataset.template)][2];toast('Template loaded into the editor')},0)}));
+  const search=document.getElementById('templateSearch');if(search)search.addEventListener('input',()=>document.querySelectorAll('[data-template-card]').forEach(card=>card.classList.toggle('hidden',!card.dataset.name.includes(search.value.toLowerCase()))));
+  const historySearch=document.getElementById('historySearch');if(historySearch)historySearch.addEventListener('input',()=>{
+    const term=historySearch.value.toLowerCase();
+    document.querySelectorAll('.stat').forEach(card=>{
+      const id=card.querySelector('[data-history-id]');
+      if(id) card.style.display = card.querySelector('.stat-label').textContent.toLowerCase().includes(term) ? 'block' : 'none';
+    });
+  });
+  const review=document.getElementById('reviewBtn');
+  if(review) review.addEventListener('click', async () => {
+    const editor=document.getElementById('codeInput');
+    if(!editor || !editor.value.trim()){toast('Please paste some code first');return;}
+    const filename = 'input.' + (document.getElementById('language').value === 'Auto-detect' ? 'py' : document.getElementById('language').value.toLowerCase());
+    try {
+      review.textContent = 'Reviewing&#8230;';
+      review.disabled = true;
+      const { result } = await anna.tools.invoke({
+        tool_id: TOOL_ID,
+        method: 'review_code',
+        args: { filename, content: editor.value, language: document.getElementById('language').value },
+        timeoutMs: 60000,
+      });
+      if (result && result.success) {
+        const data = result.data;
+        reviewResults = {
+          id: Date.now().toString(),
+          filename: data.filename,
+          language: data.language,
+          date: new Date().toISOString(),
+          score: data.score.score,
+          grade: data.score.grade,
+          findings: data.findings,
+          total: data.total_findings,
+          blocking: data.blocking,
+        };
+        reviewHistory.unshift(reviewResults);
+        if (anna) {
+          await anna.storage.set({ key: 'prism-history', value: reviewHistory });
+        } else {
+          localStorage.setItem('prism-history', JSON.stringify(reviewHistory));
+        }
+        toast(`Review complete: ${data.total_findings} findings`);
+        go('results');
+      } else {
+        toast('Review failed');
+      }
+    } catch (err) {
+      console.error(err);
+      toast('Review error: ' + (err.message || String(err)));
+    } finally {
+      review.textContent = '&#10003; &nbsp;Review';
+      review.disabled = false;
+    }
+  });
+  const editor=document.getElementById('codeInput');if(editor)editor.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter'){const btn=document.getElementById('reviewBtn');if(btn)btn.click();}});
+  document.querySelectorAll('[data-fix-toggle]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.fixToggle;
+      const fix=document.getElementById('fix-'+id);
+      if(fix){fix.classList.toggle('open');btn.textContent=fix.classList.contains('open')?'Hide Fix':'Show Fix';}
+    });
+  });
+  document.querySelectorAll('[data-history-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.historyId;
+      const r=reviewHistory.find(x=>x.id===id);
+      if(r){reviewResults=r;go('results');}
+    });
+  });
+}
+function action(name){
+  if(name==='sample'){const editor=document.getElementById('codeInput');if(editor){editor.value=sample;editor.focus();toast('Sample code loaded')}}
+  else if(name==='swap'){const original=document.getElementById('originalCode');const revised=document.getElementById('revisedCode');if(original&&revised){[original.value,revised.value]=[revised.value,original.value]}}
+  else if(name==='save')toast('Review saved to this workspace');
+  else if(name==='export')toast('Review history exported');
+  else if(name==='date')toast('Showing reviews from the last 30 days');
+  else if(name==='compare')compareVersions();
+  else if(name==='save-prefs')toast('Preferences saved');
+  else if(name==='reset')toast('Preferences reset to defaults');
+  else if(name==='new-template')toast('Template editor is ready for your snippet');
+  else if(name==='clear-history'){if(confirm('Clear all review history?')){reviewHistory=[];if(anna){anna.storage.set({key:'prism-history',value:[]});}else{localStorage.removeItem('prism-history');}render();}}
+}
+function compareVersions(){const original=document.getElementById('originalCode').value;const revised=document.getElementById('revisedCode').value;if(!original.trim()||!revised.trim()){toast('Paste both versions before comparing');return}const oldLines=original.split('\n');const newLines=revised.split('\n');const output=[];for(let i=0;i<Math.max(oldLines.length,newLines.length);i++){const oldLine=oldLines[i];const newLine=newLines[i];if(oldLine===newLine){output.push(`<div class="diff-line"><span>${i+1}</span>${escapeHtml(oldLine??'')}</div>`)}else{if(oldLine!==undefined)output.push(`<div class="diff-line del"><span>${i+1}</span>&#8722; ${escapeHtml(oldLine)}</div>`);if(newLine!==undefined)output.push(`<div class="diff-line add"><span>${i+1}</span>&#43; ${escapeHtml(newLine)}</div>`)}}document.getElementById('diffRows').innerHTML=output.join('');toast('Comparison complete')}
+function go(page){current=page;document.getElementById('navMenu').classList.remove('open');document.getElementById('menuToggle').setAttribute('aria-expanded','false');render();window.scrollTo({top:0,behavior:'smooth'})}
+function toast(text){const el=document.getElementById('toast');el.textContent=text;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1900)}
+function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function escapeAttr(s){return escapeHtml(s)}
+document.getElementById('menuToggle').addEventListener('click',()=>{menuOpen=!menuOpen;document.getElementById('navMenu').classList.toggle('open',menuOpen);document.getElementById('menuToggle').setAttribute('aria-expanded',String(menuOpen))});document.addEventListener('click',e=>{if(!e.target.closest('.menu-wrap')){menuOpen=false;document.getElementById('navMenu').classList.remove('open');document.getElementById('menuToggle').setAttribute('aria-expanded','false')}});
+init();
+</script>
+</body>
+</html>

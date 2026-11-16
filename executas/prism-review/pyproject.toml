@@ -1,0 +1,11 @@
+[project]
+name = "prism-review"
+version = "1.0.0"
+description = "PRISM Code Review Executa plugin for Anna AI OS"
+requires-python = ">=3.10"
+
+[project.scripts]
+prism-review = "plugin:main"
+
+[tool.uv]
+dev-dependencies = []
