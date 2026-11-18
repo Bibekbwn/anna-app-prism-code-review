@@ -1,0 +1,1 @@
+prism-code-review[all]==2.0.1

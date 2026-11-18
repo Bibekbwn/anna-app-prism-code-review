@@ -1,0 +1,6 @@
+.env
+.prism-reports/
+.prism-cache.json
+.prism-web.json
+*.tmp
+__pycache__/

@@ -1,0 +1,12 @@
+# Generated frontend and app-bundle output
+.next/
+out/
+node_modules/
+next-env.d.ts
+*.tsbuildinfo
+anna-app/bundle/
+
+# Local PRISM companion data; never audit or commit generated user reports
+local-companion/.prism-reports/
+local-companion/.prism-web.json
+local-companion/__pycache__/
