@@ -10,6 +10,23 @@ SEVERITY_PENALTIES = {
 }
 WEB_LANGUAGE = "JavaScript / TypeScript"
 
+# Language-specific accessibility check levels
+# "full" = all checks (JS/TS), "basic" = core checks only (all other languages)
+LANGUAGE_ACCESSIBILITY_LEVEL = {
+    "Python": "basic",
+    "JavaScript / TypeScript": "full",
+    "Go": "basic",
+    "Rust": "basic",
+    "Java": "basic",
+    "C#": "basic",
+    "C": "basic",
+    "C++": "basic",
+    "Ruby": "basic",
+    "PHP": "basic",
+    "Kotlin": "basic",
+    "Swift": "basic",
+}
+
 
 def _line_number(source, position):
     return source.count("\n", 0, position) + 1
@@ -121,14 +138,22 @@ def _keyboard_issues(source, filename):
 
 def accessibility_findings(source, filename, language):
     """Check common HTML/JSX accessibility contracts without executing code."""
-    if language != WEB_LANGUAGE:
-        return []
-    return (
-        _image_issues(source, filename)
-        + _form_issues(source, filename)
-        + _button_name_issues(source, filename)
-        + _keyboard_issues(source, filename)
-    )
+    language_level = LANGUAGE_ACCESSIBILITY_LEVEL.get(language, "basic")
+    
+    if language_level == "basic":
+        # Core checks for all languages: image alt text + button names
+        return (
+            _image_issues(source, filename)
+            + _button_name_issues(source, filename)
+        )
+    else:
+        # Full checks for JavaScript/TypeScript: all accessibility checks
+        return (
+            _image_issues(source, filename)
+            + _form_issues(source, filename)
+            + _button_name_issues(source, filename)
+            + _keyboard_issues(source, filename)
+        )
 
 
 def _score(findings, assessed, method):

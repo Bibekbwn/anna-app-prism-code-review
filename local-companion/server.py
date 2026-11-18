@@ -55,8 +55,19 @@ DEFAULT_SETTINGS = {
     "showSuggestions": True,
     "templates": [],
 }
-VALID_EFFORTS = {"Lite", "Balanced", "Max"}
-VALID_THEMES = {"Dark", "Light"}
+# Default efforts/themes can be overridden via environment variables
+# Format: comma-separated list, e.g., PRISM_VALID_EFFORTS="Lite,Balanced,Max"
+_VALID_EFFORTS_ENV = os.environ.get("PRISM_VALID_EFFORTS", "")
+VALID_EFFORTS = set(
+    [s.strip() for s in _VALID_EFFORTS_ENV.split(",") if s.strip()]
+    or {"Lite", "Balanced", "Max"}
+)
+
+_VALID_THEMES_ENV = os.environ.get("PRISM_VALID_THEMES", "")
+VALID_THEMES = set(
+    [s.strip() for s in _VALID_THEMES_ENV.split(",") if s.strip()]
+    or {"Dark", "Light"}
+)
 LANGUAGE_EXTENSIONS = {
     "Python": ".py",
     "JavaScript / TypeScript": ".ts",
