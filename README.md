@@ -132,6 +132,7 @@ Without an API key configured, PRISM runs in **regex-only mode** (4 deterministi
 ### 4. Build and bundle for Anna
 
 ```bash
+cd anna-app
 pnpm run anna:bundle
 ```
 
@@ -275,6 +276,7 @@ Companion tests cover: `test_web_security.py`, `test_quality_metrics.py`, `test_
 ### Bundle creation
 
 ```bash
+cd anna-app
 pnpm run anna:bundle
 ```
 
