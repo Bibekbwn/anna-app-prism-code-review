@@ -5,10 +5,10 @@
     "bundle": {
       "format": "static-spa",
       "entry": "index.html",
-      "external_origins": []
+      "external_origins": ["https://api.anna.partners", "http://localhost:8765"]
     },
     "csp_overrides": {
-      "connect-src": ["http://localhost:8765", "http://127.0.0.1:8765"]
+      "connect-src": ["https://api.anna.partners", "ws://api.anna.partners", "http://localhost:8765", "ws://localhost:8765"]
     },
     "views": [
       {

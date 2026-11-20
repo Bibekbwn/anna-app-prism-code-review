@@ -32,7 +32,7 @@
   },
   "environment": {
     "PRISM_WEB_PORT": "8765",
-    "PRISM_WEB_ORIGINS": "http://localhost:3000,http://127.0.0.1:3000",
+    "PRISM_WEB_ORIGINS": "https://app.anna.partners,https://www.anna.partners,http://localhost:3000",
     "PRISM_BYOK_ENABLED": "false"
   }
 }

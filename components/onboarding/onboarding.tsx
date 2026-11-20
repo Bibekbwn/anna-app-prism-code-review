@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Button } from "./ui/button"
+import { Button } from "../ui/button"
 import { useRouter } from "next/navigation"
 
-export default function Onboarding() {
+export function Onboarding() {
   const [step, setStep] = useState(1)
   const router = useRouter()
-  const onboardingCompleted = localStorage.getItem("anna_onboarding_complete") === "true"
+  const onboardingCompleted = typeof window !== 'undefined' && window.localStorage.getItem("anna_onboarding_complete") === "true"
 
   // If somehow onboarding is marked complete, go straight to app
   if (onboardingCompleted) {
@@ -88,3 +88,4 @@ export default function Onboarding() {
     </div>
   )
 }
+export default Onboarding;
