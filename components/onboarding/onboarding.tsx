@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { Button } from "./ui/button"
-import { Toaster } from "@/components/ui/toaster"
 import { useRouter } from "next/navigation"
 
 export default function Onboarding() {
@@ -55,21 +54,21 @@ export default function Onboarding() {
     setStep((prev) => prev + 1)
   }
 
-  const step = steps[step - 1] || steps[steps.length - 1]
+  const currentStep = steps[step - 1] || steps[steps.length - 1]
 
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-2xl mx-auto">
-        <h2 className="text-2xl font-bold text-desc mb-4">{step.title}</h2>
-        <p className="text-text mb-6">{step.content}</p>
+        <h2 className="text-2xl font-bold text-desc mb-4">{currentStep.title}</h2>
+        <p className="text-text mb-6">{currentStep.content}</p>
 
         <div className="space-y-4">
-          {step.title !== "Submit Your First Code" ? (
+          {currentStep.title !== "Submit Your First Code" ? (
             <Button
               onClick={handleNext}
               className="w-full"
             >
-              {step < steps[steps.length - 1] ? "Next" : "Get Started"}
+              {step < steps.length ? "Next" : "Get Started"}
             </Button>
           ) : (
             <div className="space-y-2">

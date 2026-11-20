@@ -189,6 +189,25 @@ Opens at `http://localhost:3000`. The app will show "not-checked" status for the
 
 Paste two versions of code to see a side-by-side diff with added/removed lines.
 
+### Language-Specific Security Patterns
+
+Every language has dedicated security detection rules:
+
+| Language | Security Checks |
+|----------|----------------|
+| Python | Hardcoded secrets, insecure HTTP, eval/exec, pickle, weak crypto, subprocess shell |
+| JavaScript/TypeScript | Hardcoded secrets, insecure HTTP, eval, innerHTML XSS, weak crypto, Math.random |
+| Java | Hardcoded secrets, insecure HTTP, weak crypto, Runtime.exec |
+| C# | Hardcoded secrets, insecure HTTP, weak crypto, dynamic code execution |
+| Go | Hardcoded secrets, insecure HTTP, weak crypto, exec.Command injection |
+| Rust | Hardcoded secrets, insecure HTTP, unsafe blocks, weak crypto |
+| C | Hardcoded secrets, insecure HTTP, buffer overflow (gets/strcpy), weak crypto |
+| C++ | Hardcoded secrets, insecure HTTP, buffer overflow, weak crypto |
+| Ruby | Hardcoded secrets, insecure HTTP, eval, weak crypto |
+| PHP | Hardcoded secrets, insecure HTTP, eval, weak crypto |
+| Kotlin | Hardcoded secrets, insecure HTTP, weak crypto |
+| Swift | Hardcoded secrets, insecure HTTP, force unwrap, force try, weak crypto, arc4random, keychain, ATS |
+
 ### AI Provider Setup
 
 ```bash
@@ -292,13 +311,17 @@ Located at `anna-app/manifest.json`:
 - **Form factors**: desktop + mobile
 - **CSP**: Allows `localhost:8765` and `127.0.0.1:8765` for companion connection
 
+### Executa Registration
+
+Located at `executas/prism-review/executa.json` — required for Anna AI OS App Store publishing. Defines tool name, version, entry point, port, health endpoint, supported languages, capabilities, frontend bundle, and environment variables.
+
+
 ### Important notes for Anna
 
 - The app requires the **local companion server** to be running on the user's machine
 - AI provider keys are **never** entered in the web UI — they're set locally via CLI
 - The companion only accepts **loopback requests** (localhost/127.0.0.1)
 - Website origins must be in `ALLOWED_ORIGINS` (defaults: localhost:3000, anna.partners, v0.build)
-- The manifest has a **duplicate `csp_overrides`** key — this should be cleaned up before publishing
 
 ---
 
@@ -323,8 +346,9 @@ Located at `anna-app/manifest.json`:
 | `GEMINI_API_KEY` | — | Gemini API key |
 | `ANTHROPIC_API_KEY` | — | Claude API key |
 | `OPENAI_API_KEY` | — | OpenAI API key |
-| `PRISM_WEB_PORT` | `8765` | Companion server port |
+| `PRISM_WEB_PORT` | `8765` | Companion server port (auto-fallbacks to 8766–8769) |
 | `PRISM_WEB_ORIGINS` | — | Comma-separated additional allowed origins |
+| `PRISM_BYOK_ENABLED` | `false` | Enable Bring Your Own Key support |
 | `NEXT_PUBLIC_PRISM_LOCAL_URL` | `http://localhost:8765` | Frontend companion URL |
 
 ---
@@ -334,8 +358,10 @@ Located at `anna-app/manifest.json`:
 | Issue | Solution |
 |-------|----------|
 | "PRISM companion unavailable" | Start `python local-companion/server.py` on port 8765 |
+| Port 8765 already in use | Server auto-falls back to ports 8766–8769, or set `PRISM_WEB_PORT` env var |
 | "AI not configured" | Set `MODEL_PROVIDER` + API key env vars, install provider SDK |
 | "Origin not allowed" | Add your domain to `PRISM_WEB_ORIGINS` |
 | "Module not found: prism" | `pip install prism-code-review[all]==2.0.1` |
 | TypeScript errors | Run `pnpm exec tsc --noEmit` |
-| Build fails | Check `pnpm install` completed, Node 20+ installed |
+| Build fails | Check `pnpm install` completed, Node 18+ installed |
+| Onboarding styling issues | Ensure `globals.css` has `text-desc`, `text-text` CSS classes |
