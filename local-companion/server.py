@@ -177,16 +177,23 @@ def _detect_language(code):
         return "Go"
     if re.search(r"\bfn\s+\w+", text) or "use std::" in text:
         return "Rust"
-    if "import Foundation" in text or re.search(r"\bguard\s+\w+", text):
+    if ("import Foundation" in text or re.search(r"\bguard\s+\w+", text)
+            or re.search(r"\bfunc\s+\w+", text) or re.search(r"\b(var|let)\s+\w+", text)
+            or re.search(r"\bprint\(", text)):
         return "Swift"
     if re.search(r"\bfun\s+\w+", text) or re.search(r"\bval\s+\w+\s*=", text):
         return "Kotlin"
-    if re.search(r"\busing\s+System\b", text) or "namespace " in text:
+    if (re.search(r"\busing\s+System\b", text) or "namespace " in text
+            or re.search(r"\bConsole\.", text)
+            or re.search(r"\bpublic\s+static\s+void\s+Main\b", text)):
         return "C#"
     if re.search(r"\bpublic\s+static\s+void\s+main\b", text) or "System.out.println" in text:
         return "Java"
     if re.search(r"\binterface\s+\w+\s*\{", text) or re.search(r"\btype\s+\w+\s*=\s*\{", text):
         return "JavaScript / TypeScript"
+    if ("puts " in text or re.search(r"\brequire\s+['\"]", text)
+            or re.search(r"\bgem\s+", text) or re.search(r"\bmodule\s+\w+", text)):
+        return "Ruby"
     if re.search(r"\b(def|elif|lambda)\b", text) or "import os" in text:
         return "Python"
     if re.search(r"\b(const|let|function|export)\b", text) or "=>" in text:
@@ -662,8 +669,29 @@ def main():
     parser = argparse.ArgumentParser(description="Run PRISM’s loopback-only web companion.")
     parser.add_argument("--port", type=int, default=int(os.environ.get("PRISM_WEB_PORT", "8765")))
     args = parser.parse_args()
-    server = LocalPrismServer(("127.0.0.1", args.port), PrismHandler)
-    print("PRISM local companion: http://localhost:{}/api/health".format(args.port))
+
+    # Try the requested port, then fall back to alternatives if it is in use
+    fallback_ports = [args.port, 8766, 8767, 8768, 8769]
+    server = None
+    used_port = None
+    for port in fallback_ports:
+        try:
+            server = LocalPrismServer(("127.0.0.1", port), PrismHandler)
+            used_port = port
+            break
+        except OSError:
+            continue
+
+    if server is None:
+        print("ERROR: Could not bind to any port. Tried: {}".format(", ".join(map(str, fallback_ports))))
+        print("Set PRISM_WEB_PORT to an available port or free up port 8765.")
+        raise SystemExit(1)
+
+    if used_port != args.port:
+        print("WARNING: Port {} is in use; using port {} instead.".format(args.port, used_port))
+        print("Update PRISM_WEB_ORIGINS if your frontend needs to reach this server.")
+
+    print("PRISM local companion: http://localhost:{}/api/health".format(used_port))
     print("Project data and reports stay in {}".format(APP_DIR))
     print("Allowed web origins: {}".format(", ".join(sorted(ALLOWED_ORIGINS))))
     try:

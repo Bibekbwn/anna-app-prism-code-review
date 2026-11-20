@@ -9,17 +9,17 @@ import server
 # Test all 12 supported languages
 test_cases = [
     ("Python", "def main():\n    return 1"),
-    ("JavaScript/TypeScript", "const total: number = 1"),
+    ("JavaScript / TypeScript", "const total: number = 1"),
     ("Go", "package main\nfunc main() {}"),
     ("Rust", "fn main() {}"),
     ("Java", "public class Main { public static void main(String[] args) {}}"),
-    ("C#", "public static void main() { return 0; }"),
-    ("C", "#include <stdio.h> int main() { printf(\"hello\"); return 0;}"),
-    ("C++", "public int main() { return 0;}"),
-    ("Ruby", "impl Main { fn main() {} }"),
-    ("PHP", "fun main() {}"),
-    ("Kotlin", "public int main() { return 0;}"),
-    ("Swift", "def main(): print(1)"),
+    ("C#", "public static void Main() { return 0; }"),
+    ("C", "#include <stdio.h>\nint main() { printf(\"hello\"); return 0; }"),
+    ("C++", "#include <iostream>\nint main() { return 0; }"),
+    ("Ruby", "def main\n  puts 1\nend"),
+    ("PHP", "<?php function main() { return 1; }"),
+    ("Kotlin", "fun main() { return 0 }"),
+    ("Swift", "func main() { print(1) }"),
 ]
 
 print("="*70)
