@@ -156,6 +156,103 @@ def accessibility_findings(source, filename, language):
         )
 
 
+# Language-specific security check patterns
+# Each pattern: (rule_id, severity, category, message, suggestion, regex)
+SECURITY_PATTERNS = {
+    "Swift": [
+        (
+            "SWIFT-SEC-HARDCODED_SECRET",
+            "high",
+            "Hardcoded secrets",
+            "Possible hardcoded secret or credential detected.",
+            "Use Keychain or secure environment variables instead of hardcoding secrets.",
+            r"""(?i)(password|passwd|pwd|secret|api[_-]?key|token|auth[_-]?token|private[_-]?key|access[_-]?token)\s*[:=]\s*["'][^"']{4,}["']""",
+        ),
+        (
+            "SWIFT-SEC-INSECURE-HTTP",
+            "high",
+            "Insecure network connection",
+            "Insecure HTTP URL detected; use HTTPS instead.",
+            "Use https:// URLs and enable App Transport Security (ATS).",
+            r"""(?i)https?://[^\s"'<>]+""",
+        ),
+        (
+            "SWIFT-SEC-FORCE_UNWRAP",
+            "medium",
+            "Force unwrap optional",
+            "Force-unwrapping an optional with ! may crash at runtime if nil.",
+            "Use optional binding (if let / guard let) or nil coalescing (??) instead of !.",
+            r"!\s*[\.;,\)\}]",
+        ),
+        (
+            "SWIFT-SEC-FORCE_TRY",
+            "medium",
+            "Force try",
+            "Force-try (try!) may crash if an error is thrown.",
+            "Use do/catch or try? to handle errors gracefully.",
+            r"\btry!",
+        ),
+        (
+            "SWIFT-SEC-WEAK_CRYPTO",
+            "medium",
+            "Weak cryptographic algorithm",
+            "Weak or deprecated cryptographic hash detected (MD5/SHA1).",
+            "Use SHA-256 or stronger via CryptoKit (e.g., SHA256.hash(data:)).",
+            r"""(?i)\b(MD5|SHA1|SHA-1|CC_MD5|CC_SHA1)\b""",
+        ),
+        (
+            "SWIFT-SEC-INSECURE_RANDOM",
+            "medium",
+            "Insecure random number generation",
+            "arc4random_uniform is not cryptographically secure.",
+            "Use SecureRandom or CryptoKit for security-sensitive randomness.",
+            r"\barc4random_uniform\b",
+        ),
+        (
+            "SWIFT-SEC-KEYCHAIN_ALWAYS",
+            "high",
+            "Insecure keychain accessibility",
+            "kSecAttrAccessibleAlways allows keychain access even when locked.",
+            "Use kSecAttrAccessibleWhenUnlocked or kSecAttrAccessibleAfterFirstUnlock.",
+            r"\bkSecAttrAccessibleAlways\b",
+        ),
+        (
+            "SWIFT-SEC-ATS_BYPASS",
+            "medium",
+            "App Transport Security bypass",
+            "NSAllowsArbitraryLoads disables ATS, permitting insecure connections.",
+            "Keep ATS enabled; use NSExceptionDomains for specific domains if needed.",
+            r"\bNSAllowsArbitraryLoads\b",
+        ),
+    ],
+}
+
+
+def _security_pattern_findings(source, filename, language):
+    """Run regex-based security pattern checks for the given language."""
+    patterns = SECURITY_PATTERNS.get(language, [])
+    findings = []
+    for rule_id, severity, category, message, suggestion, regex in patterns:
+        for match in re.finditer(regex, source):
+            findings.append(
+                _issue(
+                    rule_id,
+                    severity,
+                    category,
+                    message,
+                    suggestion,
+                    filename,
+                    (source, match.start()),
+                )
+            )
+    return findings
+
+
+def security_findings(source, filename, language):
+    """Check for common security anti-patterns in source code."""
+    return _security_pattern_findings(source, filename, language)
+
+
 def _score(findings, assessed, method):
     if not assessed:
         return {"score": None, "assessed": False, "findings": 0, "method": "Not assessed"}

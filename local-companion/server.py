@@ -40,7 +40,7 @@ except ImportError as error:
         "Install local-companion/requirements.txt, then restart the companion."
     ) from error
 
-from quality_metrics import accessibility_findings, category_scores
+from quality_metrics import accessibility_findings, category_scores, security_findings
 from web_security import allowed_origin, is_loopback_host, normalize_origin
 
 LOGGER = logging.getLogger("prism.local_companion")
@@ -338,6 +338,7 @@ def _run_engine_review(code, language, effort, filename):
 
     findings = _serialize_cli_findings(results, output.get("findings", []), filename, code)
     findings.extend(accessibility_findings(code, filename, language))
+    findings.extend(security_findings(code, filename, language))
     agents_run = [result.agent_name for result in results]
     return output, findings, risk_score, agents_run
 

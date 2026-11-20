@@ -1,0 +1,38 @@
+{
+  "name": "prism-review",
+  "version": "1.0.0",
+  "description": "Anna AI OS Code Review Prism - AI-powered code review tool for accessibility, quality, efficiency, and security analysis",
+  "entry": "local-companion/server.py",
+  "port": 8765,
+  "healthEndpoint": "/api/health",
+  "languages": [
+    "Python",
+    "JavaScript / TypeScript",
+    "Go",
+    "Rust",
+    "Java",
+    "C#",
+    "C",
+    "C++",
+    "Ruby",
+    "PHP",
+    "Kotlin",
+    "Swift"
+  ],
+  "capabilities": [
+    "accessibility",
+    "quality",
+    "efficiency",
+    "security"
+  ],
+  "frontend": {
+    "bundle": "anna-app/bundle",
+    "entry": "index.html",
+    "format": "static-spa"
+  },
+  "environment": {
+    "PRISM_WEB_PORT": "8765",
+    "PRISM_WEB_ORIGINS": "http://localhost:3000,http://127.0.0.1:3000",
+    "PRISM_BYOK_ENABLED": "false"
+  }
+}
